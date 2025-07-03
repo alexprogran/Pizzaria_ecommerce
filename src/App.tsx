@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
@@ -10,6 +10,7 @@ import Menu from './pages/Menu';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Orders from './pages/Orders';
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/carrinho" element={<Cart />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/pedidos" element={<Orders />} />
+                <Route path="/register" element={<Register />} />
               </Routes>
             </div>
           </CartProvider>
