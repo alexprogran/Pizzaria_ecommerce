@@ -1,27 +1,63 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Compilados Python
+__pycache__/
+*.py[cod]
+*$py.class
 
-node_modules
-dist
-dist-ssr
-*.local
+# Ambientes virtuais
+venv/
+env/
+.venv/
+.env/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Arquivos de configuração de IDEs/editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Arquivos temporários de sistema
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# Arquivos de log e cache
+*.log
+*.db
+*.pot
+*.mo
+
+# Arquivos de testes
+.coverage
+.cache/
+.tox/
+.nox/
+pytest_cache/
+.pytest_cache/
+
+# Distribuição/empacotamento
+build/
+dist/
+*.egg-info/
+.eggs/
+MANIFEST
+
+# Arquivos secretos
 .env
+*.env
+*.key
+*.pem
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Outros específicos (se usar Django, Flask, etc)
+migrations/
+instance/
+*.bak
+
 arquivo-estudo/
-venv_pizza/
+
+backend/db.sqlite3
+
+node_modules/
+
+**/venv**

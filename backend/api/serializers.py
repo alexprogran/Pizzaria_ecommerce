@@ -11,17 +11,15 @@ class UserCreateSerializer(BaseUserCreateSerializer):
     """
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'password')
+        fields = ('id', 'email', 'username', 'password')
 
 class UserSerializer(serializers.ModelSerializer):
     """
     Serializer para dados do usuário
     """
-    full_name = serializers.ReadOnlyField()
-    
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'full_name')
+        fields = ('id', 'email', 'username')
         read_only_fields = ('id', 'email')
 
 class PizzaSerializer(serializers.ModelSerializer):

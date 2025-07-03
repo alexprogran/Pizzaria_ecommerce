@@ -40,6 +40,7 @@ const Navbar: React.FC = () => {
             >
               Menu
             </Link>
+            {user && (
             <Link
               to="/pedidos"
               className={`${
@@ -48,7 +49,7 @@ const Navbar: React.FC = () => {
             >
               Pedidos
             </Link>
-            
+            )}
             {user && (
               <Link
                 to="/carrinho"
@@ -73,7 +74,7 @@ const Navbar: React.FC = () => {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-gray-600" />
-                  <span className="text-gray-700">{user.name}</span>
+                  <span className="text-gray-700">{user.username}</span>
                 </div>
                 <button
                   onClick={logout}

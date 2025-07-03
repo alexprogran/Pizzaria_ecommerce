@@ -1,10 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth import get_user_model
 from .models import User, Pizza, Pedido, ItemPedido
+
+# Opcional: desregistre o User padrão antes de registrar novamente
+try:
+    admin.site.unregister(get_user_model())
+except admin.sites.NotRegistered:
+    pass
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'is_staff', 'date_joined')
+    list_display = ('email', 'first_name', 'password')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)

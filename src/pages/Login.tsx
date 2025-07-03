@@ -56,10 +56,10 @@ const Login: React.FC = () => {
         }
       }
       
-      if (success) {
+      if (success && isLogin) {
         navigate(from, { replace: true });
       }
-    } catch (error) {
+    } catch {
       setError('Erro interno. Tente novamente mais tarde.');
     }
   };

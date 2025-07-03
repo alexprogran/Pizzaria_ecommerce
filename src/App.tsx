@@ -14,9 +14,9 @@ import Orders from './pages/Orders';
 function App() {
   return (
     <Provider store={store}>
-      <AuthProvider>
-        <CartProvider>
-          <Router>
+      <Router>
+        <AuthProvider>
+          <CartProvider>
             <div className="min-h-screen bg-gray-50">
               <Navbar />
               <Routes>
@@ -27,9 +27,9 @@ function App() {
                 <Route path="/pedidos" element={<Orders />} />
               </Routes>
             </div>
-          </Router>
-        </CartProvider>
-      </AuthProvider>
+          </CartProvider>
+        </AuthProvider>
+      </Router>
     </Provider>
   );
 }
