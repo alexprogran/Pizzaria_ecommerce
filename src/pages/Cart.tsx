@@ -37,6 +37,8 @@ export function Cart() {
         }))
       };
 
+      console.log('Dados do pedido sendo enviados:', JSON.stringify(orderData, null, 2));
+
       // Enviar o pedido
       const response = await api.post('/api/pedidos/', orderData);
 
@@ -47,19 +49,65 @@ export function Cart() {
       }
     } catch (error: any) {
       console.error('Erro ao criar pedido:', error);
+      console.error('Detalhes do erro:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers,
+        requestData: error.config?.data
+      });
+
+      // Log mais detalhado do erro
+      if (error.response?.data) {
+        console.log('Conteúdo do error.response.data:', error.response.data);
+        Object.entries(error.response.data).forEach(([key, value]) => {
+          console.log(`${key}:`, value);
+        });
+      }
       
       // Tratamento específico de erros
       if (error.response) {
         // O servidor respondeu com um status de erro
-        const errorMessage = error.response.data.error || 
-          'Ocorreu um erro ao processar seu pedido.';
+        const errorData = error.response.data;
+        let errorMessage = 'Ocorreu um erro ao processar seu pedido.';
+
+        if (typeof errorData === 'object' && errorData !== null) {
+          // Se for um objeto, tenta extrair a mensagem de erro
+          const errorMessages: string[] = [];
+          
+          // Função recursiva para extrair mensagens de erro
+          const extractErrors = (obj: Record<string, unknown>, prefix = '') => {
+            for (const [key, value] of Object.entries(obj)) {
+              if (Array.isArray(value)) {
+                errorMessages.push(`${prefix}${key}: ${value.join(', ')}`);
+              } else if (typeof value === 'object' && value !== null) {
+                extractErrors(value as Record<string, unknown>, `${prefix}${key}: `);
+              } else if (value !== null) {
+                errorMessages.push(`${prefix}${key}: ${value}`);
+              }
+            }
+          };
+          
+          extractErrors(errorData);
+          
+          if (errorMessages.length > 0) {
+            errorMessage = errorMessages.join('\n');
+          }
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
+
         toast.error(errorMessage);
+        setError(errorMessage);
       } else if (error.request) {
         // A requisição foi feita mas não houve resposta
-        toast.error('Não foi possível conectar ao servidor. Tente novamente.');
+        const errorMessage = 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.';
+        toast.error(errorMessage);
+        setError(errorMessage);
       } else {
         // Erro na configuração da requisição
-        toast.error('Erro ao processar seu pedido. Tente novamente.');
+        const errorMessage = 'Erro ao processar seu pedido. Por favor, tente novamente.';
+        toast.error(errorMessage);
+        setError(errorMessage);
       }
     } finally {
       setIsProcessing(false);

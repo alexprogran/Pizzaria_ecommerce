@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../services/api';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
   user: User | null;
@@ -32,60 +33,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Configurar o interceptor do axios
-  useEffect(() => {
-    const interceptor = axios.interceptors.request.use(
-      config => {
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+  // Verificar se o token está válido
+  const checkTokenValidity = async (token: string) => {
+    try {
+      await api.get('/auth/users/me/', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-        return config;
-      },
-      error => {
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.request.eject(interceptor);
-    };
-  }, [token]);
+      });
+      return true;
+    } catch (error) {
+      console.error('Token inválido ou expirado');
+      return false;
+    }
+  };
 
   useEffect(() => {
-    // Verificar token existente
-    const storedToken = localStorage.getItem('token');
-    const userData = localStorage.getItem('user_data');
-    
-    console.log('Token armazenado:', storedToken); // Debug
-    console.log('Dados do usuário armazenados:', userData); // Debug
-    
-    if (storedToken && userData) {
-      try {
-        setToken(storedToken);
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        console.log('Usuário recuperado:', parsedUser); // Debug
-      } catch (error) {
-        console.error('Erro ao recuperar dados:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user_data');
-        setToken(null);
-        setUser(null);
+    const loadUserData = async () => {
+      const storedToken = localStorage.getItem('token');
+      const userData = localStorage.getItem('user_data');
+      
+      if (storedToken && userData) {
+        try {
+          // Verifica se o token ainda é válido
+          const isValid = await checkTokenValidity(storedToken);
+          
+          if (isValid) {
+            setToken(storedToken);
+            const parsedUser = JSON.parse(userData);
+            setUser(parsedUser);
+            console.log('Usuário recuperado:', parsedUser);
+          } else {
+            // Token inválido ou expirado
+            console.log('Token expirado, fazendo logout');
+            logout();
+            toast.error('Sua sessão expirou. Por favor, faça login novamente.');
+          }
+        } catch (error) {
+          console.error('Erro ao recuperar dados:', error);
+          logout();
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    loadUserData();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
       // 1. Autentica e obtém o token JWT
-      const response = await axios.post('http://localhost:8000/auth/jwt/create/', {
+      const response = await api.post('/auth/jwt/create/', {
         email,
         password,
       });
-
-      console.log('Resposta do login:', response.data); // Debug
 
       if (response.data.access) {
         const accessToken = response.data.access;
@@ -93,13 +95,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(accessToken);
 
         // 2. Busca os dados do usuário autenticado
-        const userResponse = await axios.get('http://localhost:8000/auth/users/me/', {
+        const userResponse = await api.get('/auth/users/me/', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
         });
-
-        console.log('Dados do usuário:', userResponse.data); // Debug
 
         const userData = userResponse.data;
         localStorage.setItem('user_data', JSON.stringify(userData));
@@ -107,8 +107,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
         return true;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no login:', error);
+      const errorMessage = error.response?.data?.detail || 'Erro ao fazer login. Tente novamente.';
+      toast.error(errorMessage);
       setIsLoading(false);
     }
     return false;
@@ -117,19 +119,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/auth/users/', {
+      const response = await api.post('/auth/users/', {
         username: name,
         email,
         password,
       });
 
       if (response.status === 201) {
+        toast.success('Cadastro realizado com sucesso! Faça login para continuar.');
         setIsLoading(false);
         navigate('/login');
         return true;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no registro:', error);
+      const errorMessage = error.response?.data?.detail || 'Erro ao fazer cadastro. Tente novamente.';
+      toast.error(errorMessage);
     }
     setIsLoading(false);
     return false;
