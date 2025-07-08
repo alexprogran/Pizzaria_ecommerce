@@ -1,60 +1,188 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Pizza, ShoppingCart, User, Menu as MenuIcon, X, Package } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 
 export function Navbar() {
   const { user, logout } = useAuth();
   const { items } = useCart();
+  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="bg-red-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
-      <div className="container mx-auto px-4">
+    <nav className="bg-white shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-xl font-bold">
-            Pizzaria
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <Pizza className="h-8 w-8 text-red-600" />
+            <span className="text-xl font-bold text-gray-800">Pizzaria</span>
           </Link>
 
-          <div className="flex items-center space-x-4">
-            <Link to="/menu" className="hover:text-gray-200">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              to="/menu"
+              className={`${
+                isActive('/menu') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
+              } transition-colors duration-200`}
+            >
               Cardápio
             </Link>
-            
-            <Link to="/cart" className="hover:text-gray-200 relative">
-              Carrinho
+
+            {user && (
+              <Link
+                to="/orders"
+                className={`${
+                  isActive('/orders') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
+                } transition-colors duration-200`}
+              >
+                Pedidos
+              </Link>
+            )}
+
+            <Link
+              to="/cart"
+              className={`${
+                isActive('/cart') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
+              } transition-colors duration-200 flex items-center space-x-1 relative`}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              <span>Carrinho</span>
               {items.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-white text-red-600 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {items.length}
                 </span>
               )}
             </Link>
 
+            {user?.is_staff && (
+              <Link
+                to="/admin"
+                className={`${
+                  isActive('/admin') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
+                } transition-colors duration-200`}
+              >
+                Admin
+              </Link>
+            )}
+          </div>
+
+          {/* User Menu */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <>
-                <Link to="/orders" className="hover:text-gray-200">
-                  Pedidos
-                </Link>
-                
-                {user?.is_staff && (
-                  <Link to="/admin" className="hover:text-gray-200">
-                    Admin
-                  </Link>
-                )}
-                
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <User className="h-5 w-5 text-gray-600" />
+                  <span className="text-gray-700">{user.username}</span>
+                </div>
                 <button
                   onClick={logout}
-                  className="hover:text-gray-200"
+                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200"
                 >
                   Sair
                 </button>
-              </>
+              </div>
             ) : (
-              <Link to="/login" className="hover:text-gray-200">
+              <Link
+                to="/login"
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200"
+              >
                 Entrar
               </Link>
             )}
           </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 rounded-md text-gray-700 hover:text-red-600"
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-4">
+              <Link
+                to="/menu"
+                onClick={() => setIsMenuOpen(false)}
+                className={`${
+                  isActive('/menu') ? 'text-red-600' : 'text-gray-700'
+                } block px-2 py-1`}
+              >
+                Cardápio
+              </Link>
+
+              {user && (
+                <Link
+                  to="/orders"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`${
+                    isActive('/orders') ? 'text-red-600' : 'text-gray-700'
+                  } block px-2 py-1 flex items-center space-x-2`}
+                >
+                  <Package className="h-5 w-5" />
+                  <span>Pedidos</span>
+                </Link>
+              )}
+
+              <Link
+                to="/cart"
+                onClick={() => setIsMenuOpen(false)}
+                className={`${
+                  isActive('/cart') ? 'text-red-600' : 'text-gray-700'
+                } block px-2 py-1 flex items-center space-x-2`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span>Carrinho ({items.length})</span>
+              </Link>
+
+              {user?.is_staff && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`${
+                    isActive('/admin') ? 'text-red-600' : 'text-gray-700'
+                  } block px-2 py-1`}
+                >
+                  Admin
+                </Link>
+              )}
+
+              {user ? (
+                <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                  <div className="flex items-center space-x-2 px-2">
+                    <User className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-700">{user.email}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 mx-2"
+                  >
+                    Sair
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 mx-2 text-center"
+                >
+                  Entrar
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
