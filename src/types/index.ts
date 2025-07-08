@@ -1,10 +1,19 @@
+export interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_staff: boolean;
+}
+
 export interface Pizza {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
+  id: number;
+  nome: string;
+  descricao: string;
+  preco: number;
+  imagem: string;
+  categoria: string;
+  ativo: boolean;
 }
 
 export interface CartItem {
@@ -12,27 +21,27 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
 export interface OrderItem {
-  id: string;
-  pizza: string;
+  id: number;
   quantidade: number;
   preco_unitario: number;
+  pizza: Pizza;
 }
 
 export interface Order {
-  id: string;
-  usuario: string;
-  itens: OrderItem[];
+  id: number;
   valor_total: number;
-  status: 'PENDENTE' | 'PAGO' | 'CANCELADO' | 'PREPARANDO' | 'ENTREGUE';
-  data: string;
-  created_at?: Date;
+  status: 'PENDENTE' | 'PAGO' | 'PREPARANDO' | 'ENTREGUE' | 'CANCELADO';
+  data_criacao: string;
+  observacoes?: string;
+  itens: OrderItem[];
+  usuario: User;
+}
+
+export interface ApiError {
+  message: string;
+  status: number;
+  data?: Record<string, unknown>;
 }
 
 export interface OrdersState {

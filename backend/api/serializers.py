@@ -19,8 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('id', 'email', 'username')
-        read_only_fields = ('id', 'email')
+        fields = ('id', 'email', 'username', 'is_staff')
+        read_only_fields = ('id', 'email', 'is_staff')
 
 class PizzaSerializer(serializers.ModelSerializer):
     """
@@ -85,48 +85,75 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
         model = Pedido
         fields = ('observacoes', 'itens')
     
+    def validate(self, data):
+        """
+        Validação adicional dos dados
+        """
+        itens_data = data.get('itens', [])
+        
+        if not itens_data:
+            raise serializers.ValidationError({
+                'itens': "O pedido deve ter pelo menos um item."
+            })
+        
+        # Validar cada item
+        for item in itens_data:
+            if not isinstance(item.get('quantidade'), int) or item.get('quantidade') < 1:
+                raise serializers.ValidationError({
+                    'itens': f"Quantidade inválida para o item: {item}"
+                })
+            
+            pizza = item.get('pizza')
+            if not pizza:
+                raise serializers.ValidationError({
+                    'itens': f"Pizza não especificada para o item: {item}"
+                })
+            
+            if not pizza.ativo:
+                raise serializers.ValidationError({
+                    'itens': f"A pizza '{pizza.nome}' não está disponível."
+                })
+        
+        return data
+    
     def create(self, validated_data):
         itens_data = validated_data.pop('itens')
         usuario = self.context['request'].user
         
-        # Criar o pedido
-        pedido = Pedido.objects.create(
-            usuario=usuario,
-            valor_total=0,  # Será calculado depois
-            **validated_data
-        )
-        
-        # Criar os itens do pedido
-        for item_data in itens_data:
-            pizza = item_data['pizza']
-            ItemPedido.objects.create(
-                pedido=pedido,
-                pizza=pizza,
-                quantidade=item_data['quantidade'],
-                preco_unitario=pizza.preco  # Congela o preço atual
+        try:
+            # Calcular o valor total antes de criar o pedido
+            valor_total = sum(
+                item_data['quantidade'] * item_data['pizza'].preco
+                for item_data in itens_data
             )
-        
-        # Calcular e salvar o total
-        pedido.calcular_total()
-        pedido.save()
-        
-        return pedido
-    
-    def validate_itens(self, value):
-        """
-        Valida se há pelo menos um item no pedido
-        """
-        if not value:
-            raise serializers.ValidationError("O pedido deve ter pelo menos um item.")
-        
-        # Verifica se todas as pizzas estão ativas
-        for item in value:
-            if not item['pizza'].ativo:
-                raise serializers.ValidationError(
-                    f"A pizza '{item['pizza'].nome}' não está disponível."
+            
+            # Criar o pedido com o valor total calculado
+            pedido = Pedido.objects.create(
+                usuario=usuario,
+                valor_total=valor_total,
+                **validated_data
+            )
+            
+            # Criar os itens do pedido
+            for item_data in itens_data:
+                pizza = item_data['pizza']
+                ItemPedido.objects.create(
+                    pedido=pedido,
+                    pizza=pizza,
+                    quantidade=item_data['quantidade'],
+                    preco_unitario=pizza.preco  # Congela o preço atual
                 )
-        
-        return value
+            
+            return pedido
+            
+        except Exception as e:
+            # Se algo der errado, registrar o erro e relançar
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erro ao criar pedido: {str(e)}")
+            logger.error(f"Dados do pedido: {validated_data}")
+            logger.error(f"Itens do pedido: {itens_data}")
+            raise
 
 class PedidoUpdateSerializer(serializers.ModelSerializer):
     """

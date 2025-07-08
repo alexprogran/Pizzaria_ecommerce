@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 interface LoginFormData {
   email: string;
@@ -16,12 +17,14 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
-const Login: React.FC = () => {
+export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const from = location.state?.from?.pathname || '/';
 
@@ -40,14 +43,19 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData & RegisterFormData) => {
     setError('');
     try {
+      setIsLoading(true);
       const success = await login(data.email, data.password);
       if (!success) {
         setError('Email ou senha inválidos');
       } else {
+        toast.success('Login realizado com sucesso!');
         navigate(from, { replace: true });
       }
-    } catch {
-      setError('Erro interno. Tente novamente mais tarde.');
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      toast.error(error.response?.data?.detail || 'Erro ao fazer login. Verifique suas credenciais.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,6 +95,8 @@ const Login: React.FC = () => {
                   type="email"
                   className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                   placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
               </div>
@@ -111,6 +121,8 @@ const Login: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   className="block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                   placeholder="Sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
                 <button
@@ -153,6 +165,4 @@ const Login: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}

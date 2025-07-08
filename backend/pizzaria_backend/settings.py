@@ -171,6 +171,10 @@ DJOSER = {
         'current_user': 'api.serializers.UserSerializer',
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
     },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
+    }
 }
 
 # CORS settings

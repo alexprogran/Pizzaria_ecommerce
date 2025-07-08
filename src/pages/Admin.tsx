@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { toast } from 'react-toastify';
 import { Order } from '../types';
 
-export function Orders() {
+export function Admin() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!user) {
-            navigate('/login');
+        if (!user?.is_staff) {
+            navigate('/');
             return;
         }
 
@@ -36,35 +36,39 @@ export function Orders() {
         }
     };
 
-    const getStatusColor = (status: Order['status']) => {
-        const colors = {
-            PENDENTE: 'bg-yellow-100 text-yellow-800',
-            PAGO: 'bg-blue-100 text-blue-800',
-            PREPARANDO: 'bg-purple-100 text-purple-800',
-            ENTREGUE: 'bg-green-100 text-green-800',
-            CANCELADO: 'bg-red-100 text-red-800'
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800'; // Fallback para status desconhecido
+    const updateOrderStatus = async (orderId: number, newStatus: Order['status']) => {
+        try {
+            await api.patch(`/api/pedidos/${orderId}/`, {
+                status: newStatus
+            });
+            
+            toast.success('Status do pedido atualizado com sucesso!');
+            loadOrders(); // Recarrega a lista de pedidos
+        } catch (error) {
+            console.error('Erro ao atualizar status:', error);
+            toast.error('Erro ao atualizar status do pedido.');
+        }
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).format(date);
-    };
-
-    if (!user) {
+    if (!user?.is_staff) {
         return null;
     }
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">Meus Pedidos</h1>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">Painel Administrativo</h1>
+                <div className="flex gap-4">
+                    <button
+                        onClick={() => navigate('/register-pizza')}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                        Cadastrar Nova Pizza
+                    </button>
+                </div>
+            </div>
+
+            <h2 className="text-2xl font-semibold mb-6">Pedidos</h2>
 
             {isLoading ? (
                 <div className="text-center py-8">
@@ -72,15 +76,7 @@ export function Orders() {
                 </div>
             ) : orders.length === 0 ? (
                 <div className="text-center py-8">
-                    <p className="text-gray-600 mb-4">
-                        Você ainda não fez nenhum pedido
-                    </p>
-                    <button
-                        onClick={() => navigate('/menu')}
-                        className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                        Ver Cardápio
-                    </button>
+                    <p className="text-gray-600">Nenhum pedido encontrado.</p>
                 </div>
             ) : (
                 <div className="grid gap-4">
@@ -94,20 +90,28 @@ export function Orders() {
                                     <h3 className="text-lg font-semibold">
                                         Pedido #{order.id}
                                     </h3>
-                                    <p className="text-sm text-gray-600">
-                                        {formatDate(order.data_criacao)}
+                                    <p className="text-gray-600">
+                                        Cliente: {order.usuario.first_name} {order.usuario.last_name}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        Total: R$ {order.valor_total.toFixed(2)}
                                     </p>
                                 </div>
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                                        order.status
-                                    )}`}
+                                <select
+                                    value={order.status}
+                                    onChange={(e) => updateOrderStatus(order.id, e.target.value as Order['status'])}
+                                    className="border rounded-md p-2"
                                 >
-                                    {order.status}
-                                </span>
+                                    <option value="PENDENTE">Pendente</option>
+                                    <option value="PAGO">Pago</option>
+                                    <option value="PREPARANDO">Preparando</option>
+                                    <option value="ENTREGUE">Entregue</option>
+                                    <option value="CANCELADO">Cancelado</option>
+                                </select>
                             </div>
 
                             <div className="space-y-2">
+                                <h4 className="font-medium">Itens do Pedido:</h4>
                                 {order.itens?.map((item) => (
                                     <div
                                         key={item.id}
@@ -123,19 +127,10 @@ export function Orders() {
                                 ))}
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                                <div className="flex justify-between items-center font-medium">
-                                    <span>Total</span>
-                                    <span>R$ {order.valor_total.toFixed(2)}</span>
-                                </div>
-                            </div>
-
                             {order.observacoes && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                    <h4 className="font-medium mb-2">
-                                        Observações:
-                                    </h4>
-                                    <p className="text-sm text-gray-600">
+                                <div className="mt-4">
+                                    <h4 className="font-medium">Observações:</h4>
+                                    <p className="text-gray-600 text-sm">
                                         {order.observacoes}
                                     </p>
                                 </div>
@@ -147,3 +142,5 @@ export function Orders() {
         </div>
     );
 }
+
+export default Admin; 

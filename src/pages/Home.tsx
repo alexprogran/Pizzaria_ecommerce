@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChefHat, Clock, Star, Phone, MapPin, Mail } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 
-const Home: React.FC = () => {
+export function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -212,6 +212,4 @@ const Home: React.FC = () => {
       </section>
     </div>
   );
-};
-
-export default Home;
+}

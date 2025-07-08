@@ -1,16 +1,54 @@
-import React, { useState } from 'react';
-import { pizzas } from '../data/pizzas';
-import PizzaCard from '../components/PizzaCard';
+import React, { useState, useEffect } from 'react';
+import { PizzaCard } from '../components/PizzaCard';
 import ScrollReveal from '../components/ScrollReveal';
+import { Pizza } from '../types';
 
-const Menu: React.FC = () => {
+interface PaginatedResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Pizza[];
+}
+
+export function Menu() {
+  const [pizzas, setPizzas] = useState<Pizza[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const categories = ['Todas', ...Array.from(new Set(pizzas.map(pizza => pizza.category)))];
+  useEffect(() => {
+    setLoading(true);
+    fetch('http://localhost:8000/api/pizzas/')
+      .then((response) => {
+        if (!response.ok) throw new Error('Erro ao buscar pizzas');
+        return response.json();
+      })
+      .then((data: PaginatedResponse) => {
+        // Extrai o array de pizzas da resposta paginada
+        setPizzas(data.results || []);
+        setLoading(false);
+      })
+      .catch((err: Error) => {
+        console.error('Erro completo:', err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
-  const filteredPizzas = selectedCategory === 'Todas' 
-    ? pizzas 
-    : pizzas.filter(pizza => pizza.category === selectedCategory);
+  const categories: string[] = ['Todas', ...Array.from(new Set(pizzas.map(pizza => pizza.categoria)))];
+
+  const filteredPizzas: Pizza[] =
+    selectedCategory === 'Todas'
+      ? pizzas
+      : pizzas.filter(pizza => pizza.categoria === selectedCategory);
+
+  if (loading) {
+    return <div className="text-center py-12">Carregando...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-12 text-red-600">Erro: {error}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -26,10 +64,10 @@ const Menu: React.FC = () => {
           </div>
         </ScrollReveal>
 
-        {/* Category Filter */}
+        {/* Filtro de Categoria */}
         <ScrollReveal>
           <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {categories.map(category => (
+            {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
@@ -45,9 +83,9 @@ const Menu: React.FC = () => {
           </div>
         </ScrollReveal>
 
-        {/* Pizza Grid */}
+        {/* Grade de Pizzas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPizzas.map((pizza, index) => (
+          {filteredPizzas.map((pizza) => (
             <ScrollReveal key={pizza.id}>
               <PizzaCard pizza={pizza} />
             </ScrollReveal>
@@ -64,6 +102,4 @@ const Menu: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Menu;
+}

@@ -8,20 +8,51 @@ from .serializers import (
     PizzaSerializer, PedidoSerializer, PedidoCreateSerializer, 
     PedidoUpdateSerializer, ItemPedidoSerializer
 )
+import logging
 
-class PizzaViewSet(viewsets.ReadOnlyModelViewSet):
+logger = logging.getLogger(__name__)
+
+class PizzaViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para pizzas (apenas leitura)
-    GET /api/pizzas/ - Lista todas as pizzas ativas
-    GET /api/pizzas/{id}/ - Detalhes de uma pizza
+    ViewSet para pizzas
+    GET /api/pizzas/ - Lista todas as pizzas ativas (público)
+    POST /api/pizzas/ - Cria nova pizza (admin)
+    GET /api/pizzas/{id}/ - Detalhes de uma pizza (público)
+    PUT/PATCH /api/pizzas/{id}/ - Atualiza pizza (admin)
+    DELETE /api/pizzas/{id}/ - Remove pizza (admin)
     """
-    queryset = Pizza.objects.filter(ativo=True)
+    queryset = Pizza.objects.all()
     serializer_class = PizzaSerializer
-    permission_classes = [permissions.AllowAny]  # Público
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['categoria']
     search_fields = ['nome', 'descricao']
     ordering = ['categoria', 'nome']
+
+    def get_queryset(self):
+        """
+        Retorna apenas pizzas ativas para usuários não-admin
+        """
+        if self.request.user.is_staff:
+            return Pizza.objects.all()
+        return Pizza.objects.filter(ativo=True)
+
+    def get_permissions(self):
+        """
+        Permite acesso público para listagem e detalhes
+        Requer admin para criar, atualizar e deletar
+        """
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAdminUser]
+        return [permission() for permission in permission_classes]
+
+    def perform_destroy(self, instance):
+        """
+        Soft delete - apenas marca como inativo
+        """
+        instance.ativo = False
+        instance.save()
 
 class PedidoViewSet(viewsets.ModelViewSet):
     """
@@ -53,11 +84,44 @@ class PedidoViewSet(viewsets.ModelViewSet):
             return PedidoUpdateSerializer
         return PedidoSerializer
     
+    def create(self, request, *args, **kwargs):
+        """
+        Sobrescreve o método create para adicionar tratamento de erro
+        """
+        try:
+            logger.info(f"Iniciando criação de pedido. Dados recebidos: {request.data}")
+            
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            logger.info(f"Dados validados: {serializer.validated_data}")
+            
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            
+            logger.info(f"Pedido criado com sucesso: {serializer.data}")
+            
+            return Response(
+                serializer.data, 
+                status=status.HTTP_201_CREATED, 
+                headers=headers
+            )
+        except Exception as e:
+            logger.error(f"Erro ao criar pedido: {str(e)}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
     def perform_create(self, serializer):
         """
         Associa o pedido ao usuário logado
         """
-        serializer.save(usuario=self.request.user)
+        try:
+            serializer.save(usuario=self.request.user)
+        except Exception as e:
+            logger.error(f"Erro ao salvar pedido: {str(e)}")
+            raise
     
     def destroy(self, request, *args, **kwargs):
         """

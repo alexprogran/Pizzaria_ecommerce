@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Pizza } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -8,7 +8,7 @@ interface PizzaCardProps {
   pizza: Pizza;
 }
 
-const PizzaCard: React.FC<PizzaCardProps> = ({ pizza }) => {
+export function PizzaCard({ pizza }: PizzaCardProps) {
   const { user } = useAuth();
   const { addItem } = useCart();
 
@@ -18,31 +18,37 @@ const PizzaCard: React.FC<PizzaCardProps> = ({ pizza }) => {
     }
   };
 
+  // Converte o preço para número e garante 2 casas decimais
+  const formatPrice = (price: number | string): string => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return numPrice.toFixed(2);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="aspect-w-16 aspect-h-9">
         <img
-          src={pizza.image}
-          alt={pizza.name}
+          src={pizza.imagem}
+          alt={pizza.nome}
           className="w-full h-48 object-cover"
         />
       </div>
       
       <div className="p-6">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold text-gray-800">{pizza.name}</h3>
+          <h3 className="text-xl font-semibold text-gray-800">{pizza.nome}</h3>
           <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded-full">
-            {pizza.category}
+            {pizza.categoria}
           </span>
         </div>
         
         <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-          {pizza.description}
+          {pizza.descricao}
         </p>
         
         <div className="flex justify-between items-center">
           <span className="text-2xl font-bold text-red-600">
-            R$ {pizza.price.toFixed(2)}
+            R$ {formatPrice(pizza.preco)}
           </span>
           
           {user ? (
@@ -62,6 +68,4 @@ const PizzaCard: React.FC<PizzaCardProps> = ({ pizza }) => {
       </div>
     </div>
   );
-};
-
-export default PizzaCard;
+}

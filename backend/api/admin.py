@@ -11,7 +11,7 @@ except admin.sites.NotRegistered:
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'first_name', 'password')
+    list_display = ('email','is_staff', 'is_superuser')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)

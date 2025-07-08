@@ -4,7 +4,7 @@ from .views import PizzaViewSet, PedidoViewSet, ItemPedidoViewSet
 
 # Criar o router e registrar as viewsets
 router = DefaultRouter()
-router.register(r'pizzas', PizzaViewSet)
+router.register(r'pizzas', PizzaViewSet, basename='pizza')
 router.register(r'pedidos', PedidoViewSet, basename='pedido')
 router.register(r'itens-pedido', ItemPedidoViewSet, basename='itempedido')
 

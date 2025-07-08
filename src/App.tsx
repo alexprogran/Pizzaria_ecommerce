@@ -1,38 +1,38 @@
 // import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { store } from './store';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Menu from './pages/Menu';
-import Cart from './pages/Cart';
-import Login from './pages/Login';
-import Orders from './pages/Orders';
-import Register from './pages/Register';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AppRoutes } from './routes';
+import { Navbar } from './components/Navbar';
 
 function App() {
   return (
-    <Provider store={store}>
-      <Router>
-        <AuthProvider>
-          <CartProvider>
-            <div className="min-h-screen bg-gray-50">
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/carrinho" element={<Cart />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/pedidos" element={<Orders />} />
-                <Route path="/register" element={<Register />} />
-              </Routes>
+    <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <div className="pt-16">
+              <AppRoutes />
             </div>
-          </CartProvider>
-        </AuthProvider>
-      </Router>
-    </Provider>
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </div>
+        </CartProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

@@ -4,8 +4,8 @@ import { CartItem, Pizza } from '../types';
 interface CartContextType {
   items: CartItem[];
   addItem: (pizza: Pizza) => void;
-  removeItem: (pizzaId: string) => void;
-  updateQuantity: (pizzaId: string, quantity: number) => void;
+  removeItem: (pizzaId: number) => void;
+  updateQuantity: (pizzaId: number, quantity: number) => void;
   clearCart: () => void;
   total: number;
   itemCount: number;
@@ -42,11 +42,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   };
 
-  const removeItem = (pizzaId: string) => {
+  const removeItem = (pizzaId: number) => {
     setItems(prev => prev.filter(item => item.pizza.id !== pizzaId));
   };
 
-  const updateQuantity = (pizzaId: string, quantity: number) => {
+  const updateQuantity = (pizzaId: number, quantity: number) => {
     if (quantity <= 0) {
       removeItem(pizzaId);
       return;
@@ -64,7 +64,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems([]);
   };
 
-  const total = items.reduce((sum, item) => sum + (item.pizza.price * item.quantity), 0);
+  const total = items.reduce((sum, item) => {
+    const price = typeof item.pizza.preco === 'string' 
+      ? parseFloat(item.pizza.preco) 
+      : item.pizza.preco;
+    return sum + (price * item.quantity);
+  }, 0);
+
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
 
   return (

@@ -3,26 +3,67 @@ import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
+import { toast } from 'react-toastify';
 
-const Cart: React.FC = () => {
+export function Cart() {
   const { items, updateQuantity, removeItem, total, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleCheckout = async () => {
-    setIsProcessing(true);
-    
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Clear cart and show success
-    clearCart();
-    setIsProcessing(false);
-    
-    // In a real app, redirect to order confirmation
-    alert('Pedido realizado com sucesso! Você receberá sua pizza em até 30 minutos.');
-    navigate('/');
+    if (!token) {
+      toast.error('Por favor, faça login para continuar.');
+      navigate('/login');
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error('Seu carrinho está vazio.');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      setError(null);
+
+      // Preparar os dados do pedido
+      const orderData = {
+        itens: items.map(item => ({
+          pizza: item.pizza.id,
+          quantidade: item.quantity
+        }))
+      };
+
+      // Enviar o pedido
+      const response = await api.post('/api/pedidos/', orderData);
+
+      if (response.status === 201) {
+        toast.success('Pedido realizado com sucesso!');
+        clearCart();
+        navigate('/orders');
+      }
+    } catch (error: any) {
+      console.error('Erro ao criar pedido:', error);
+      
+      // Tratamento específico de erros
+      if (error.response) {
+        // O servidor respondeu com um status de erro
+        const errorMessage = error.response.data.error || 
+          'Ocorreu um erro ao processar seu pedido.';
+        toast.error(errorMessage);
+      } else if (error.request) {
+        // A requisição foi feita mas não houve resposta
+        toast.error('Não foi possível conectar ao servidor. Tente novamente.');
+      } else {
+        // Erro na configuração da requisição
+        toast.error('Erro ao processar seu pedido. Tente novamente.');
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!user) {
@@ -83,20 +124,22 @@ const Cart: React.FC = () => {
             <div key={item.pizza.id} className="p-6 border-b border-gray-200 last:border-b-0">
               <div className="flex items-center space-x-4">
                 <img
-                  src={item.pizza.image}
-                  alt={item.pizza.name}
+                  src={item.pizza.imagem}
+                  alt={item.pizza.nome}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
                 
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    {item.pizza.name}
+                    {item.pizza.nome}
                   </h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    {item.pizza.description}
+                    {item.pizza.descricao}
                   </p>
                   <p className="text-red-600 font-bold mt-2">
-                    R$ {item.pizza.price.toFixed(2)}
+                    R$ {typeof item.pizza.preco === 'string' 
+                      ? parseFloat(item.pizza.preco).toFixed(2) 
+                      : item.pizza.preco.toFixed(2)}
                   </p>
                 </div>
 
@@ -138,6 +181,12 @@ const Cart: React.FC = () => {
               </span>
             </div>
 
+            {error && (
+              <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md">
+                {error}
+              </div>
+            )}
+
             <button
               onClick={handleCheckout}
               disabled={isProcessing}
@@ -150,6 +199,4 @@ const Cart: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Cart;
+}

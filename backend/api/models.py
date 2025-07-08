@@ -1,7 +1,29 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("O campo de e-mail é obrigatório")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError("Superusuário precisa ter is_staff=True.")
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError("Superusuário precisa ter is_superuser=True.")
+
+        return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
     """
@@ -14,12 +36,23 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     
+    objects = UserManager()
+    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
+    
+    def save(self, *args, **kwargs):
+        """
+        Sobrescreve o método save para garantir que superusuários
+        tenham is_staff=True
+        """
+        if self.is_superuser:
+            self.is_staff = True
+        super().save(*args, **kwargs)
 
 class Pizza(models.Model):
     """
