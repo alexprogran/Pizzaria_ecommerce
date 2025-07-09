@@ -1,11 +1,15 @@
 import React from 'react';
 import { Search, Filter, X } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { setStatusFilter, setCustomerNameFilter, clearFilters } from '../store/slices/ordersSlice';
 
-const OrdersFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { filters } = useAppSelector(state => state.orders);
+interface OrdersFilterProps {
+  onFilterChange?: (filters: { status: string; customerName: string }) => void;
+}
+
+const OrdersFilter: React.FC<OrdersFilterProps> = ({ onFilterChange }) => {
+  const [filters, setFilters] = React.useState({
+    status: '',
+    customerName: ''
+  });
 
   const statusOptions = [
     { value: '', label: 'Todos os Status' },
@@ -17,15 +21,21 @@ const OrdersFilter: React.FC = () => {
   ];
 
   const handleStatusChange = (status: string) => {
-    dispatch(setStatusFilter(status));
+    const newFilters = { ...filters, status };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
   };
 
   const handleCustomerNameChange = (name: string) => {
-    dispatch(setCustomerNameFilter(name));
+    const newFilters = { ...filters, customerName: name };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
   };
 
   const handleClearFilters = () => {
-    dispatch(clearFilters());
+    const newFilters = { status: '', customerName: '' };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
   };
 
   const hasActiveFilters = filters.status || filters.customerName;
