@@ -118,7 +118,6 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         itens_data = validated_data.pop('itens')
-        usuario = self.context['request'].user
         
         try:
             # Calcular o valor total antes de criar o pedido
@@ -129,7 +128,6 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
             
             # Criar o pedido com o valor total calculado
             pedido = Pedido.objects.create(
-                usuario=usuario,
                 valor_total=valor_total,
                 **validated_data
             )

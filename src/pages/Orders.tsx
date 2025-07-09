@@ -117,7 +117,7 @@ export function Orders() {
                                             {item.quantidade}x {item.pizza.nome}
                                         </span>
                                         <span>
-                                            R$ {(item.quantidade * item.preco_unitario).toFixed(2)}
+                                            R$ {(Number(item.quantidade) * Number(item.preco_unitario)).toFixed(2)}
                                         </span>
                                     </div>
                                 ))}
@@ -126,7 +126,7 @@ export function Orders() {
                             <div className="mt-4 pt-4 border-t border-gray-200">
                                 <div className="flex justify-between items-center font-medium">
                                     <span>Total</span>
-                                    <span>R$ {order.valor_total.toFixed(2)}</span>
+                                    <span>R$ {Number(order.valor_total).toFixed(2)}</span>
                                 </div>
                             </div>
 
