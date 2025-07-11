@@ -11,7 +11,15 @@ class UserCreateSerializer(BaseUserCreateSerializer):
     """
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
-        fields = ('id', 'email', 'username', 'password')
+        fields = ('id', 'email', 'username', 'password', 'first_name', 'last_name')
+        
+    def create(self, validated_data):
+        """
+        Sobrescreve o método create para garantir que o username seja o email se não for fornecido
+        """
+        if not validated_data.get('username'):
+            validated_data['username'] = validated_data.get('email')
+        return super().create(validated_data)
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -62,15 +70,13 @@ class PedidoSerializer(serializers.ModelSerializer):
     """
     Serializer para visualização de pedidos
     """
-    usuario_nome = serializers.CharField(source='usuario.full_name', read_only=True)
-    usuario_email = serializers.CharField(source='usuario.email', read_only=True)
+    usuario = UserSerializer(read_only=True)
     itens = ItemPedidoSerializer(many=True, read_only=True)
     
     class Meta:
         model = Pedido
         fields = (
-            'id', 'usuario', 'usuario_nome', 'usuario_email',
-            'valor_total', 'status', 'observacoes', 
+            'id', 'usuario', 'valor_total', 'status', 'observacoes', 
             'data_criacao', 'data_atualizacao', 'itens'
         )
         read_only_fields = ('id', 'usuario', 'valor_total', 'data_criacao', 'data_atualizacao')

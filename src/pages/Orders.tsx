@@ -8,6 +8,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorMessage from '../components/ErrorMessage';
 import ScrollReveal from '../components/ScrollReveal';
 import OrdersFilter from '../components/OrdersFilter';
+import OrderCard from '../components/OrderCard';
 
 const Orders: React.FC = () => {
     const { user } = useAuth();
@@ -30,7 +31,9 @@ const Orders: React.FC = () => {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await api.get('/api/pedidos/');
+            // Se o usuário for admin, busca todos os pedidos, caso contrário, busca apenas os pedidos do usuário
+            const endpoint = user?.is_staff ? '/api/pedidos/todos/' : '/api/pedidos/';
+            const response = await api.get(endpoint);
             const ordersData = Array.isArray(response.data) ? response.data : response.data.results || [];
             setOrders(ordersData);
             setFilteredOrders(ordersData);
@@ -51,37 +54,16 @@ const Orders: React.FC = () => {
             filtered = filtered.filter(order => order.status === filters.status);
         }
 
-        if (filters.customerName) {
+        if (filters.customerName && user?.is_staff) {
             const searchTerm = filters.customerName.toLowerCase();
             filtered = filtered.filter(order => {
-                const fullName = `${order.usuario.first_name} ${order.usuario.last_name}`.toLowerCase();
-                return fullName.includes(searchTerm);
+                const username = order.usuario.username.toLowerCase();
+                const email = order.usuario.email.toLowerCase();
+                return username.includes(searchTerm) || email.includes(searchTerm);
             });
         }
 
         setFilteredOrders(filtered);
-    };
-
-    const getStatusColor = (status: Order['status']) => {
-        const colors = {
-            PENDENTE: 'bg-yellow-100 text-yellow-800',
-            PAGO: 'bg-blue-100 text-blue-800',
-            PREPARANDO: 'bg-purple-100 text-purple-800',
-            ENTREGUE: 'bg-green-100 text-green-800',
-            CANCELADO: 'bg-red-100 text-red-800'
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800';
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).format(date);
     };
 
     // Estatísticas dos pedidos
@@ -106,10 +88,12 @@ const Orders: React.FC = () => {
                 <ScrollReveal>
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                            Gerenciamento de Pedidos
+                            {user?.is_staff ? 'Gerenciamento de Todos os Pedidos' : 'Meus Pedidos'}
                         </h1>
                         <p className="text-gray-600">
-                            Visualize e gerencie todos os pedidos da pizzaria
+                            {user?.is_staff 
+                                ? 'Visualize e gerencie todos os pedidos da pizzaria'
+                                : 'Acompanhe seus pedidos'}
                         </p>
                     </div>
                 </ScrollReveal>
@@ -169,10 +153,10 @@ const Orders: React.FC = () => {
 
                 {/* Filtros */}
                 <ScrollReveal>
-                    <OrdersFilter onFilterChange={handleFilterChange} />
+                    <OrdersFilter onFilterChange={handleFilterChange} showCustomerFilter={user?.is_staff} />
                 </ScrollReveal>
 
-                {/* Conteúdo Principal */}
+                {/* Lista de Pedidos */}
                 {isLoading && <LoadingSkeleton />}
 
                 {error && (
@@ -192,11 +176,13 @@ const Orders: React.FC = () => {
                                     </h3>
                                     <p className="text-gray-600">
                                         {orders.length === 0 
-                                            ? 'Você ainda não fez nenhum pedido'
+                                            ? (user?.is_staff 
+                                                ? 'Não há pedidos registrados no sistema'
+                                                : 'Você ainda não fez nenhum pedido')
                                             : 'Nenhum pedido corresponde aos filtros aplicados.'
                                         }
                                     </p>
-                                    {orders.length === 0 && (
+                                    {!user?.is_staff && orders.length === 0 && (
                                         <button
                                             onClick={() => navigate('/menu')}
                                             className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
@@ -207,62 +193,10 @@ const Orders: React.FC = () => {
                                 </div>
                             </ScrollReveal>
                         ) : (
-                            <div className="grid gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                                 {filteredOrders.map((order) => (
                                     <ScrollReveal key={order.id}>
-                                        <div className="bg-white p-6 rounded-lg shadow-md">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div>
-                                                    <h3 className="text-lg font-semibold">
-                                                        Pedido #{order.id}
-                                                    </h3>
-                                                    <p className="text-sm text-gray-600">
-                                                        {formatDate(order.data_criacao)}
-                                                    </p>
-                                                </div>
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                                                        order.status
-                                                    )}`}
-                                                >
-                                                    {order.status}
-                                                </span>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                {order.itens?.map((item) => (
-                                                    <div
-                                                        key={item.id}
-                                                        className="flex justify-between items-center text-sm"
-                                                    >
-                                                        <span>
-                                                            {item.quantidade}x {item.pizza.nome}
-                                                        </span>
-                                                        <span>
-                                                            R$ {(Number(item.quantidade) * Number(item.preco_unitario)).toFixed(2)}
-                                                        </span>
-                                                    </div>
-                                                ))}
-                                            </div>
-
-                                            <div className="mt-4 pt-4 border-t border-gray-200">
-                                                <div className="flex justify-between items-center font-medium">
-                                                    <span>Total</span>
-                                                    <span>R$ {Number(order.valor_total).toFixed(2)}</span>
-                                                </div>
-                                            </div>
-
-                                            {order.observacoes && (
-                                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                                    <h4 className="font-medium mb-2">
-                                                        Observações:
-                                                    </h4>
-                                                    <p className="text-sm text-gray-600">
-                                                        {order.observacoes}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
+                                        <OrderCard order={order} />
                                     </ScrollReveal>
                                 ))}
                             </div>
@@ -273,5 +207,4 @@ const Orders: React.FC = () => {
         </div>
     );
 };
-
-export { Orders };
+export default Orders;

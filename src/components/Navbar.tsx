@@ -6,7 +6,7 @@ import { useCart } from '../contexts/CartContext';
 
 export function Navbar() {
   const { user, logout } = useAuth();
-  const { items } = useCart();
+  const { itemCount } = useCart();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -52,9 +52,9 @@ export function Navbar() {
             >
               <ShoppingCart className="h-5 w-5" />
               <span>Carrinho</span>
-              {items.length > 0 && (
+              {itemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {items.length}
+                  {itemCount}
                 </span>
               )}
             </Link>
@@ -77,7 +77,7 @@ export function Navbar() {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-gray-600" />
-                  <span className="text-gray-700">{user.username}</span>
+                  <span className="text-gray-700">{user.email}</span>
                 </div>
                 <button
                   onClick={logout}
@@ -140,7 +140,7 @@ export function Navbar() {
                 } block px-2 py-1 flex items-center space-x-2`}
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span>Carrinho ({items.length})</span>
+                <span>Carrinho ({itemCount})</span>
               </Link>
 
               {user?.is_staff && (

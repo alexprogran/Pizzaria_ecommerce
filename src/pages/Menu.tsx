@@ -25,7 +25,14 @@ export function Menu() {
       })
       .then((data: PaginatedResponse) => {
         // Extrai o array de pizzas da resposta paginada
-        setPizzas(data.results || []);
+        console.log('Dados recebidos do backend:', data.results);
+        // Garante que os IDs são números
+        const pizzasComIdNumerico = data.results.map(pizza => ({
+          ...pizza,
+          id: Number(pizza.id)
+        }));
+        console.log('Pizzas com IDs convertidos:', pizzasComIdNumerico);
+        setPizzas(pizzasComIdNumerico || []);
         setLoading(false);
       })
       .catch((err: Error) => {

@@ -1,8 +1,7 @@
 export interface User {
   id: number;
   email: string;
-  first_name: string;
-  last_name: string;
+  username: string;
   is_staff: boolean;
 }
 
@@ -35,7 +34,7 @@ export interface Order {
   data_criacao: string;
   observacoes?: string;
   itens: OrderItem[];
-  usuario: User;
+  usuario: User; 
 }
 
 export interface ApiError {

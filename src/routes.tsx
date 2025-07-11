@@ -3,7 +3,7 @@ import { Home } from './pages/Home';
 import { Menu } from './pages/Menu';
 import { Cart } from './pages/Cart';
 import { Login } from './pages/Login';
-import { Orders } from './pages/Orders';
+import Orders  from './pages/Orders';
 import { Register } from './pages/Register';
 import { RegisterPizza } from './pages/RegisterPizza';
 import { Admin } from './pages/Admin';

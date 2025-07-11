@@ -29,21 +29,44 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
   const addItem = (pizza: Pizza) => {
+    console.log('Adicionando pizza:', pizza);
+    console.log('ID da pizza:', pizza.id, 'Tipo:', typeof pizza.id);
+    console.log('Carrinho atual:', items);
+    
     setItems(prev => {
-      const existingItem = prev.find(item => item.pizza.id === pizza.id);
+      console.log('Estado anterior do carrinho:', prev);
+      // Converte os IDs para número para garantir a comparação correta
+      const pizzaId = Number(pizza.id);
+      console.log('ID convertido:', pizzaId, 'Tipo:', typeof pizzaId);
+      
+      const existingItem = prev.find(item => {
+        const itemId = Number(item.pizza.id);
+        console.log('Comparando com item:', itemId, 'Tipo:', typeof itemId);
+        return itemId === pizzaId;
+      });
+      
+      console.log('Item existente encontrado:', existingItem);
+
       if (existingItem) {
-        return prev.map(item =>
-          item.pizza.id === pizza.id
+        console.log('Atualizando quantidade do item existente');
+        const newItems = prev.map(item =>
+          Number(item.pizza.id) === pizzaId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
+        console.log('Novo estado do carrinho:', newItems);
+        return newItems;
       }
-      return [...prev, { pizza, quantity: 1 }];
+      
+      console.log('Adicionando novo item ao carrinho');
+      const newItems = [...prev, { pizza, quantity: 1 }];
+      console.log('Novo estado do carrinho:', newItems);
+      return newItems;
     });
   };
 
   const removeItem = (pizzaId: number) => {
-    setItems(prev => prev.filter(item => item.pizza.id !== pizzaId));
+    setItems(prev => prev.filter(item => Number(item.pizza.id) !== pizzaId));
   };
 
   const updateQuantity = (pizzaId: number, quantity: number) => {
@@ -53,7 +76,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
     setItems(prev =>
       prev.map(item =>
-        item.pizza.id === pizzaId
+        Number(item.pizza.id) === pizzaId
           ? { ...item, quantity }
           : item
       )
@@ -61,7 +84,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const clearCart = () => {
+    console.log('Limpando o carrinho...');
+    console.log('Estado atual do carrinho:', items);
     setItems([]);
+    // Verificação assíncrona para garantir que o estado foi atualizado
+    setTimeout(() => {
+      console.log('Estado do carrinho após limpeza:', items);
+    }, 0);
   };
 
   const total = items.reduce((sum, item) => {
