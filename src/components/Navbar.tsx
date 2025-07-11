@@ -24,14 +24,16 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/menu"
-              className={`${
-                isActive('/menu') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
-              } transition-colors duration-200`}
-            >
-              Cardápio
-            </Link>
+            {user && (
+              <Link
+                to="/menu"
+                className={`${
+                  isActive('/menu') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
+                } transition-colors duration-200`}
+              >
+                Munu
+              </Link>
+            )}
 
             {user && (
               <Link
@@ -44,20 +46,22 @@ export function Navbar() {
               </Link>
             )}
 
-            <Link
-              to="/cart"
-              className={`${
-                isActive('/cart') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
-              } transition-colors duration-200 flex items-center space-x-1 relative`}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <span>Carrinho</span>
-              {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
+            {user && (
+              <Link
+                to="/cart"
+                className={`${
+                  isActive('/cart') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
+                } transition-colors duration-200 flex items-center space-x-1 relative`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span>Carrinho</span>
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {user?.is_staff && (
               <Link
@@ -109,15 +113,17 @@ export function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
-              <Link
-                to="/menu"
-                onClick={() => setIsMenuOpen(false)}
-                className={`${
-                  isActive('/menu') ? 'text-red-600' : 'text-gray-700'
-                } block px-2 py-1`}
-              >
-                Cardápio
-              </Link>
+              {user && (
+                <Link
+                  to="/menu"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`${
+                    isActive('/menu') ? 'text-red-600' : 'text-gray-700'
+                  } block px-2 py-1`}
+                >
+                  Cardápio
+                </Link>
+              )}
 
               {user && (
                 <Link
@@ -132,16 +138,18 @@ export function Navbar() {
                 </Link>
               )}
 
-              <Link
-                to="/cart"
-                onClick={() => setIsMenuOpen(false)}
-                className={`${
-                  isActive('/cart') ? 'text-red-600' : 'text-gray-700'
-                } block px-2 py-1 flex items-center space-x-2`}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <span>Carrinho ({itemCount})</span>
-              </Link>
+              {user && (
+                <Link
+                  to="/cart"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`${
+                    isActive('/cart') ? 'text-red-600' : 'text-gray-700'
+                  } block px-2 py-1 flex items-center space-x-2`}
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  <span>Carrinho ({itemCount})</span>
+                </Link>
+              )}
 
               {user?.is_staff && (
                 <Link
