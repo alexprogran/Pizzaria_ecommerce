@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { toast } from 'react-toastify';
 
 interface AuthContextType {
   user: User | null;
@@ -67,7 +66,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             // Token inválido ou expirado
             console.log('Token expirado, fazendo logout');
             logout();
-            toast.error('Sua sessão expirou. Por favor, faça login novamente.');
           }
         } catch (error) {
           console.error('Erro ao recuperar dados:', error);
@@ -107,13 +105,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
         return true;
       }
-    } catch (error: any) {
+      throw new Error('Falha na autenticação');
+    } catch (error) {
       console.error('Erro no login:', error);
-      const errorMessage = error.response?.data?.detail || 'Erro ao fazer login. Tente novamente.';
-      toast.error(errorMessage);
       setIsLoading(false);
+      throw error; // Propaga o erro para o componente Login
     }
-    return false;
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
@@ -126,7 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (response.status === 201) {
-        toast.success('Cadastro realizado com sucesso! Faça login para continuar.');
+        // toast.success('Cadastro realizado com sucesso! Faça login para continuar.'); // Removed toast
         setIsLoading(false);
         navigate('/login');
         return true;
@@ -134,7 +131,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error('Erro no registro:', error);
       const errorMessage = error.response?.data?.detail || 'Erro ao fazer cadastro. Tente novamente.';
-      toast.error(errorMessage);
+      // toast.error(errorMessage); // Removed toast
     }
     setIsLoading(false);
     return false;

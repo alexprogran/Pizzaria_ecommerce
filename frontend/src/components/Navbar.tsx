@@ -19,7 +19,7 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Pizza className="h-8 w-8 text-red-600" />
-            <span className="text-xl font-bold text-gray-800">Pizzaria</span>
+            <span className="text-xl font-bold text-gray-800">Bella Pizza</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -31,7 +31,7 @@ export function Navbar() {
                   isActive('/menu') ? 'text-red-600' : 'text-gray-700 hover:text-red-600'
                 } transition-colors duration-200`}
               >
-                Munu
+                Menu
               </Link>
             )}
 
@@ -81,7 +81,7 @@ export function Navbar() {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-gray-600" />
-                  <span className="text-gray-700">{user.email}</span>
+                  <span className="text-gray-700">{user.username}</span>
                 </div>
                 <button
                   onClick={logout}

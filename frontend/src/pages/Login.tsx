@@ -24,7 +24,9 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  
   const from = location.state?.from?.pathname || '/';
+  
 
   const {
     register,
@@ -42,12 +44,11 @@ export function Login() {
     setError('');
     try {
       await login(data.email, data.password);
-      toast.success('Login realizado com sucesso!');
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } };
       console.error('Erro no login:', error);
-      toast.error(error.response?.data?.detail || 'Erro ao fazer login. Verifique suas credenciais.');
+      toast.error(error.response?.data?.detail || 'Email ou senha inválidos', { autoClose: 2000 });
       setError('Email ou senha inválidos');
     }
   };
@@ -63,6 +64,12 @@ export function Login() {
           <h2 className="text-3xl font-extrabold text-gray-900">
             Entre na sua conta
           </h2>
+          <div className="mt-2 text-sm text-gray-600 text-center bg-gray-100 p-3 rounded-md">
+            <p>Para acesso de todas as funcionalidades, entre como administrador:</p>
+            <p className="font-medium mt-1">Email: admin@email.com</p>
+            <p className="font-medium">Senha: admin@123</p>
+            <p className="mt-1">Ou crie sua própria conta.</p>
+          </div>
           <p className="mt-2 text-center text-sm text-gray-600">
             Não tem uma conta?{' '}
             <Link
