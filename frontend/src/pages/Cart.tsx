@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { toast } from 'react-toastify';
+import { ApiError } from '../types';
 
 export function Cart() {
   const { items, updateQuantity, removeItem, total, clearCart } = useCart();
@@ -43,72 +44,58 @@ export function Cart() {
       const response = await api.post('/api/pedidos/', orderData);
 
       if (response.status === 201) {
-        toast.success('Pedido realizado com sucesso!');
+        console.log('Pedido criado com sucesso, limpando carrinho...');
         clearCart();
+        console.log('Carrinho limpo, redirecionando para pedidos...');
+        toast.success('Pedido realizado com sucesso!');
         navigate('/orders');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao criar pedido:', error);
+      
+      const apiError = error as ApiError;
+      
       console.error('Detalhes do erro:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        headers: error.response?.headers,
-        requestData: error.config?.data
+        status: apiError.status,
+        data: apiError.data,
       });
 
       // Log mais detalhado do erro
-      if (error.response?.data) {
-        console.log('Conteúdo do error.response.data:', error.response.data);
-        Object.entries(error.response.data).forEach(([key, value]) => {
+      if (apiError.data) {
+        console.log('Conteúdo do error.data:', apiError.data);
+        Object.entries(apiError.data).forEach(([key, value]) => {
           console.log(`${key}:`, value);
         });
       }
       
       // Tratamento específico de erros
-      if (error.response) {
-        // O servidor respondeu com um status de erro
-        const errorData = error.response.data;
-        let errorMessage = 'Ocorreu um erro ao processar seu pedido.';
+      let errorMessage = 'Ocorreu um erro ao processar seu pedido.';
 
-        if (typeof errorData === 'object' && errorData !== null) {
-          // Se for um objeto, tenta extrair a mensagem de erro
-          const errorMessages: string[] = [];
-          
-          // Função recursiva para extrair mensagens de erro
-          const extractErrors = (obj: Record<string, unknown>, prefix = '') => {
-            for (const [key, value] of Object.entries(obj)) {
-              if (Array.isArray(value)) {
-                errorMessages.push(`${prefix}${key}: ${value.join(', ')}`);
-              } else if (typeof value === 'object' && value !== null) {
-                extractErrors(value as Record<string, unknown>, `${prefix}${key}: `);
-              } else if (value !== null) {
-                errorMessages.push(`${prefix}${key}: ${value}`);
-              }
+      if (apiError.data) {
+        const errorMessages: string[] = [];
+        
+        // Função recursiva para extrair mensagens de erro
+        const extractErrors = (obj: Record<string, unknown>, prefix = '') => {
+          for (const [key, value] of Object.entries(obj)) {
+            if (Array.isArray(value)) {
+              errorMessages.push(`${prefix}${key}: ${value.join(', ')}`);
+            } else if (typeof value === 'object' && value !== null) {
+              extractErrors(value as Record<string, unknown>, `${prefix}${key}: `);
+            } else if (value !== null) {
+              errorMessages.push(`${prefix}${key}: ${value}`);
             }
-          };
-          
-          extractErrors(errorData);
-          
-          if (errorMessages.length > 0) {
-            errorMessage = errorMessages.join('\n');
           }
-        } else if (typeof errorData === 'string') {
-          errorMessage = errorData;
+        };
+        
+        extractErrors(apiError.data);
+        
+        if (errorMessages.length > 0) {
+          errorMessage = errorMessages.join('\n');
         }
-
-        toast.error(errorMessage);
-        setError(errorMessage);
-      } else if (error.request) {
-        // A requisição foi feita mas não houve resposta
-        const errorMessage = 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.';
-        toast.error(errorMessage);
-        setError(errorMessage);
-      } else {
-        // Erro na configuração da requisição
-        const errorMessage = 'Erro ao processar seu pedido. Por favor, tente novamente.';
-        toast.error(errorMessage);
-        setError(errorMessage);
       }
+
+      toast.error(errorMessage);
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }

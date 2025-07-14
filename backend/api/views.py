@@ -57,7 +57,7 @@ class PizzaViewSet(viewsets.ModelViewSet):
 class PedidoViewSet(viewsets.ModelViewSet):
     """
     ViewSet para pedidos
-    GET /api/pedidos/ - Lista pedidos do usuário logado
+    GET /api/pedidos/ - Lista pedidos do usuário  
     POST /api/pedidos/ - Cria novo pedido
     GET /api/pedidos/{id}/ - Detalhes de um pedido
     PATCH /api/pedidos/{id}/ - Atualiza status do pedido
@@ -160,8 +160,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
         
         if usuario_filter:
             queryset = queryset.filter(
-                Q(usuario__first_name__icontains=usuario_filter) |
-                Q(usuario__last_name__icontains=usuario_filter) |
+                Q(usuario__username__icontains=usuario_filter) |
                 Q(usuario__email__icontains=usuario_filter)
             )
         

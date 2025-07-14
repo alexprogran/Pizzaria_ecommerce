@@ -9,8 +9,6 @@ interface RegisterFormData {
     email: string;
     password: string;
     confirmPassword: string;
-    first_name: string;
-    last_name: string;
     username: string;
 }
 
@@ -38,11 +36,9 @@ export function Register() {
         try {
             setIsLoading(true);
 
-            const response = await api.post('/api/users/', {
+            const response = await api.post('/auth/users/', {
                 email: data.email,
                 password: data.password,
-                first_name: data.first_name,
-                last_name: data.last_name,
                 username: data.username || data.email
             });
 
@@ -113,43 +109,18 @@ export function Register() {
                         </div>
 
                         <div>
-                            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
-                                Nome
+                            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                                Nome de usuário (opcional)
                             </label>
                             <div className="mt-1 relative">
                                 <input
-                                    {...register('first_name', {
-                                        required: 'Nome é obrigatório'
-                                    })}
+                                    {...register('username')}
                                     type="text"
                                     className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
-                                    placeholder="Seu nome"
+                                    placeholder="Seu nome de usuário"
                                 />
                                 <User className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
                             </div>
-                            {errors.first_name && (
-                                <p className="mt-1 text-sm text-red-600">{errors.first_name.message}</p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
-                                Sobrenome
-                            </label>
-                            <div className="mt-1 relative">
-                                <input
-                                    {...register('last_name', {
-                                        required: 'Sobrenome é obrigatório'
-                                    })}
-                                    type="text"
-                                    className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
-                                    placeholder="Seu sobrenome"
-                                />
-                                <User className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
-                            </div>
-                            {errors.last_name && (
-                                <p className="mt-1 text-sm text-red-600">{errors.last_name.message}</p>
-                            )}
                         </div>
 
                         <div>

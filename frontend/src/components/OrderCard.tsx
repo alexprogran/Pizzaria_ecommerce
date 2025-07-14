@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, User, Package, DollarSign } from 'lucide-react';
 import { Order } from '../types';
 
-interface OrderCardProps {
+interface OrderCardProps { 
   order: Order;
 }
 
@@ -25,7 +25,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(dateString); 
     return date.toLocaleString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -41,7 +41,12 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center space-x-2">
           <User className="h-5 w-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-800">{order.usuario}</h3>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {order.usuario.username}
+            </h3>
+            <p className="text-sm text-gray-600">{order.usuario.email}</p>
+          </div>
         </div>
         <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
           {order.status}
@@ -57,7 +62,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
         
         <div className="flex items-center space-x-2 text-gray-600">
           <Calendar className="h-4 w-4" />
-          <span className="text-sm">{formatDate(order.data)}</span>
+          <span className="text-sm">{formatDate(order.data_criacao)}</span>
         </div>
       </div>
 
@@ -68,7 +73,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
           {order.itens.map((item) => (
             <div key={item.id} className="flex justify-between items-center text-sm">
               <span className="text-gray-600">
-                {item.quantidade}x {item.pizza}
+                {item.quantidade}x {item.pizza.nome}
               </span>
               <span className="font-medium text-gray-800">
                 R$ {(item.quantidade * item.preco_unitario).toFixed(2)}
@@ -86,7 +91,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
             <span className="text-sm font-medium text-gray-700">Total:</span>
           </div>
           <span className="text-xl font-bold text-green-600">
-            R$ {order.valor_total.toFixed(2)}
+            R$ {Number(order.valor_total).toFixed(2)}
           </span>
         </div>
       </div>

@@ -23,13 +23,13 @@ export function Login() {
   const { login, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
+  
   const from = location.state?.from?.pathname || '/';
+  
 
   const {
-    register: registerForm,
+    register,
     handleSubmit,
     formState: { errors }
   } = useForm<LoginFormData & RegisterFormData>();
@@ -44,12 +44,11 @@ export function Login() {
     setError('');
     try {
       await login(data.email, data.password);
-      toast.success('Login realizado com sucesso!');
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const error = err as { response?: { data?: { detail?: string } } };
       console.error('Erro no login:', error);
-      toast.error(error.response?.data?.detail || 'Erro ao fazer login. Verifique suas credenciais.');
+      toast.error(error.response?.data?.detail || 'Email ou senha inválidos', { autoClose: 2000 });
       setError('Email ou senha inválidos');
     }
   };
@@ -65,6 +64,12 @@ export function Login() {
           <h2 className="text-3xl font-extrabold text-gray-900">
             Entre na sua conta
           </h2>
+          <div className="mt-2 text-sm text-gray-600 text-center bg-gray-100 p-3 rounded-md">
+            <p>Para acesso de todas as funcionalidades, entre como administrador:</p>
+            <p className="font-medium mt-1">Email: admin@email.com</p>
+            <p className="font-medium">Senha: admin@123</p>
+            <p className="mt-1">Ou crie sua própria conta.</p>
+          </div>
           <p className="mt-2 text-center text-sm text-gray-600">
             Não tem uma conta?{' '}
             <Link
@@ -84,7 +89,7 @@ export function Login() {
               </label>
               <div className="mt-1 relative">
                 <input
-                  {...registerForm('email', {
+                  {...register('email', {
                     required: 'Email é obrigatório',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -94,8 +99,6 @@ export function Login() {
                   type="email"
                   className="block w-full px-3 py-2 pl-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
                   placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Mail className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
               </div>
@@ -110,7 +113,7 @@ export function Login() {
               </label>
               <div className="mt-1 relative">
                 <input
-                  {...registerForm('password', {
+                  {...register('password', {
                     required: 'Senha é obrigatória',
                     minLength: {
                       value: 6,
@@ -120,8 +123,6 @@ export function Login() {
                   type={showPassword ? 'text' : 'password'}
                   className="block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
                   placeholder="Sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Lock className="h-5 w-5 text-gray-400 absolute left-3 top-2.5" />
                 <button

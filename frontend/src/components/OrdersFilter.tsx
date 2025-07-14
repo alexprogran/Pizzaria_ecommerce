@@ -1,11 +1,16 @@
 import React from 'react';
 import { Search, Filter, X } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { setStatusFilter, setCustomerNameFilter, clearFilters } from '../store/slices/ordersSlice';
 
-const OrdersFilter: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { filters } = useAppSelector(state => state.orders);
+interface OrdersFilterProps {
+  onFilterChange?: (filters: { status: string; customerName: string }) => void;
+  showCustomerFilter?: boolean;
+}
+
+const OrdersFilter: React.FC<OrdersFilterProps> = ({ onFilterChange, showCustomerFilter = false }) => {
+  const [filters, setFilters] = React.useState({
+    status: '',
+    customerName: ''
+  });
 
   const statusOptions = [
     { value: '', label: 'Todos os Status' },
@@ -17,15 +22,21 @@ const OrdersFilter: React.FC = () => {
   ];
 
   const handleStatusChange = (status: string) => {
-    dispatch(setStatusFilter(status));
+    const newFilters = { ...filters, status };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
   };
 
   const handleCustomerNameChange = (name: string) => {
-    dispatch(setCustomerNameFilter(name));
+    const newFilters = { ...filters, customerName: name };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
   };
 
   const handleClearFilters = () => {
-    dispatch(clearFilters());
+    const newFilters = { status: '', customerName: '' };
+    setFilters(newFilters);
+    onFilterChange?.(newFilters);
   };
 
   const hasActiveFilters = filters.status || filters.customerName;
@@ -47,26 +58,28 @@ const OrdersFilter: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Filtro por Nome do Cliente */}
-        <div>
-          <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-2">
-            Buscar por Cliente
-          </label>
-          <div className="relative">
-            <Search className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
-            <input
-              type="text"
-              id="customerName"
-              value={filters.customerName}
-              onChange={(e) => handleCustomerNameChange(e.target.value)}
-              placeholder="Digite o nome do cliente..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-            />
+        {/* Filtro por Nome do Cliente - Só aparece para admin */}
+        {showCustomerFilter && (
+          <div>
+            <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-2">
+              Buscar por Cliente
+            </label>
+            <div className="relative">
+              <Search className="h-4 w-4 text-gray-400 absolute left-3 top-3" />
+              <input
+                type="text"
+                id="customerName"
+                value={filters.customerName}
+                onChange={(e) => handleCustomerNameChange(e.target.value)}
+                placeholder="Digite o nome do cliente..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Filtro por Status */}
-        <div>
+        <div className={showCustomerFilter ? '' : 'md:col-span-2'}>
           <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
             Filtrar por Status
           </label>

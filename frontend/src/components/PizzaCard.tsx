@@ -14,6 +14,12 @@ export function PizzaCard({ pizza }: PizzaCardProps) {
 
   const handleAddToCart = () => {
     if (user) {
+      console.log('PizzaCard - Dados da pizza antes de adicionar:', {
+        id: pizza.id,
+        tipo_id: typeof pizza.id,
+        nome: pizza.nome,
+        preco: pizza.preco
+      });
       addItem(pizza);
     }
   };
