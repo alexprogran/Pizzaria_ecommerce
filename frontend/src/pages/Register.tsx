@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Mail, Lock, Eye, EyeOff, Pizza, User } from 'lucide-react';
-import { api } from '../services/api';
 import { toast } from 'react-toastify';
+import { api } from '../services/api';
 
 interface RegisterFormData {
     email: string;
@@ -36,7 +36,7 @@ export function Register() {
         try {
             setIsLoading(true);
 
-            const response = await api.post('/auth/users/', {
+            const response = await api.post('users/', {
                 email: data.email,
                 password: data.password,
                 username: data.username || data.email

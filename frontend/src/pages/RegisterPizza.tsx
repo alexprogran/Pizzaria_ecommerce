@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ApiError } from '../types';
 import { Pizza } from 'lucide-react';
@@ -54,6 +54,7 @@ export function RegisterPizza() {
         }
 
         // Validações
+
         if (!formData.nome || !formData.descricao || !formData.preco || !formData.imagem) {
             toast.error('Por favor, preencha todos os campos.');
             return;
@@ -69,10 +70,20 @@ export function RegisterPizza() {
                 return;
             }
 
-            // Enviar dados para a API
-            const response = await api.post('/api/pizzas/', {
+            // Obter token do localStorage
+            const token = localStorage.getItem('token');
+	  
+
+
+            // Enviar dados para a API usando axios diretamente
+            const response = await axios.post('/api/pizzas/', {
                 ...formData,
                 preco
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (response.status === 201) {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
+import axios from 'axios';
 import { Order } from '../types';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorMessage from '../components/ErrorMessage';
@@ -28,12 +28,22 @@ const Orders: React.FC = () => {
     }, [user, navigate]);
 
     const loadOrders = async () => {
-        try {
+        try { 
             setIsLoading(true);
             setError(null);
+            
+            // Obter token do localStorage
+            const token = localStorage.getItem('token');
+            
+            // Configurar headers com token de autenticação
+            const headers = {
+                'Content-Type': 'application/json',
+                ...(token && { Authorization: `Bearer ${token}` })
+            };
+            
             // Se o usuário for admin, busca todos os pedidos, caso contrário, busca apenas os pedidos do usuário
             const endpoint = user?.is_staff ? '/api/pedidos/todos/' : '/api/pedidos/';
-            const response = await api.get(endpoint);
+            const response = await axios.get(endpoint, { headers });
             const ordersData = Array.isArray(response.data) ? response.data : response.data.results || [];
             setOrders(ordersData);
             setFilteredOrders(ordersData);
