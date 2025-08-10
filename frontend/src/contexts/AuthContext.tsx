@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Verificar se o token está válido
   const checkTokenValidity = async (token: string) => {
     try {
-      await api.get('/auth/users/me/', {
+      await api.get('/auth/users/me/', { 
         headers: {
           'Authorization': `Bearer ${token}`
         }

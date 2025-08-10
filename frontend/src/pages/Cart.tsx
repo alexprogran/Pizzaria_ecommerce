@@ -3,7 +3,7 @@ import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ApiError } from '../types';
 
@@ -40,8 +40,13 @@ export function Cart() {
 
       console.log('Dados do pedido sendo enviados:', JSON.stringify(orderData, null, 2));
 
-      // Enviar o pedido
-      const response = await api.post('/api/pedidos/', orderData);
+      // Enviar o pedido usando axios diretamente com autenticação no cabeçalho
+      const response = await axios.post('http://127.0.0.1:8000/api/pedidos/', orderData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
       if (response.status === 201) {
         console.log('Pedido criado com sucesso, limpando carrinho...');

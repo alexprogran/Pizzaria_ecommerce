@@ -7,7 +7,7 @@ interface PaginatedResponse {
   count: number;
   next: string | null;
   previous: string | null;
-  results: Pizza[];
+  results: Pizza[]; 
 }
 
 export function Menu() {
@@ -147,4 +147,4 @@ export function Menu() {
       </div>
     </div>
   );
-}
+} 

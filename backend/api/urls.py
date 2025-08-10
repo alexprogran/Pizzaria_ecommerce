@@ -10,4 +10,4 @@ router.register(r'itens-pedido', ItemPedidoViewSet, basename='itempedido')
 
 urlpatterns = [
     path('', include(router.urls)),
-]
+] 
