@@ -43,7 +43,9 @@ const Orders: React.FC = () => {
             
             // Se o usuário for admin, busca todos os pedidos, caso contrário, busca apenas os pedidos do usuário
             const endpoint = user?.is_staff ? '/api/pedidos/todos/' : '/api/pedidos/';
-            const response = await axios.get(`http://127.0.0.1:8000${endpoint}`, { headers });
+
+            const response = await axios.get(endpoint, { headers });
+
             const ordersData = Array.isArray(response.data) ? response.data : response.data.results || [];
             setOrders(ordersData);
             setFilteredOrders(ordersData);

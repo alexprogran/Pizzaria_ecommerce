@@ -35,7 +35,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Verificar se o token está válido
   const checkTokenValidity = async (token: string) => {
     try {
-      await api.get('/auth/users/me/', { 
+      await api.get('users/me/', {
+
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -82,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       // 1. Autentica e obtém o token JWT
-      const response = await api.post('/auth/jwt/create/', {
+      const response = await api.post('jwt/create/', {
         email,
         password,
       });
@@ -93,7 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(accessToken);
 
         // 2. Busca os dados do usuário autenticado
-        const userResponse = await api.get('/auth/users/me/', {
+        const userResponse = await api.get('users/me/', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -116,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await api.post('/auth/users/', {
+      const response = await api.post('users/', {
         username: name,
         email,
         password,

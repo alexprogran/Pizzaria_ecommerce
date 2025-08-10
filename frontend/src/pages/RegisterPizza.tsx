@@ -54,6 +54,7 @@ export function RegisterPizza() {
         }
 
         // Validações
+
         if (!formData.nome || !formData.descricao || !formData.preco || !formData.imagem) {
             toast.error('Por favor, preencha todos os campos.');
             return;
@@ -71,9 +72,9 @@ export function RegisterPizza() {
 
             // Obter token do localStorage
             const token = localStorage.getItem('token');
-
+ 
             // Enviar dados para a API usando axios diretamente
-            const response = await axios.post('http://127.0.0.1:8000/api/pizzas/', {
+            const response = await axios.post('/api/pizzas/', {
                 ...formData,
                 preco
             }, {

@@ -18,7 +18,7 @@ export function Menu() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:8000/api/pizzas/')
+    fetch('/api/pizzas/')
       .then((response) => {
         if (!response.ok) throw new Error('Erro ao buscar pizzas');
         return response.json();
@@ -148,3 +148,4 @@ export function Menu() {
     </div>
   );
 } 
+
