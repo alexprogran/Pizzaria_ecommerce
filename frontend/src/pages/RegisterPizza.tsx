@@ -72,9 +72,7 @@ export function RegisterPizza() {
 
             // Obter token do localStorage
             const token = localStorage.getItem('token');
-	  
-
-
+ 
             // Enviar dados para a API usando axios diretamente
             const response = await axios.post('/api/pizzas/', {
                 ...formData,

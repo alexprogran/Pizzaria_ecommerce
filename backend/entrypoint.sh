@@ -2,34 +2,37 @@
 
 set -e
 
-# Função para verificar se o MySQL está pronto
-mysql_ready() {
+# Função para verificar se o PostgreSQL está pronto
+postgres_ready() {
 python << END
 import sys
-import MySQLdb
+import psycopg2
 try:
-    MySQLdb.connect(
-        db="${MYSQL_DATABASE}",
-        user="${MYSQL_USER}",
-        passwd="${MYSQL_PASSWORD}",
-        host="${MYSQL_HOST}",
-        port=int("${MYSQL_PORT}")
+    psycopg2.connect(
+        dbname="${POSTGRES_DB}",
+        user="${POSTGRES_USER}",
+        password="${POSTGRES_PASSWORD}",
+        host="${POSTGRES_HOST}",
+        port="${POSTGRES_PORT}"
     )
-except MySQLdb.Error:
+except psycopg2.Error:
     sys.exit(1)
 sys.exit(0)
 END
 }
 
-# Espera até o MySQL estar disponível
-until mysql_ready; do
-  echo "Waiting for MySQL to become available..."
+# Espera até o PostgreSQL estar disponível
+until postgres_ready; do
+  echo "Waiting for PostgreSQL to become available..."
   sleep 1
 done
-echo "MySQL is available"
+echo "PostgreSQL is available"
 
 echo "Applying migrations..."
 python manage.py migrate
+
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
 
 echo "Creating superuser..."
 export DJANGO_SUPERUSER_USERNAME=admin

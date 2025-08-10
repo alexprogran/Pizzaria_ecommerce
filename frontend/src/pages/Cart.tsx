@@ -41,7 +41,9 @@ export function Cart() {
       console.log('Dados do pedido sendo enviados:', JSON.stringify(orderData, null, 2));
 
       // Enviar o pedido usando axios diretamente com autenticação no cabeçalho
+
       const response = await axios.post('/api/pedidos/', orderData, {
+
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`

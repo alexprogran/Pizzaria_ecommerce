@@ -43,7 +43,9 @@ const Orders: React.FC = () => {
             
             // Se o usuário for admin, busca todos os pedidos, caso contrário, busca apenas os pedidos do usuário
             const endpoint = user?.is_staff ? '/api/pedidos/todos/' : '/api/pedidos/';
+
             const response = await axios.get(endpoint, { headers });
+
             const ordersData = Array.isArray(response.data) ? response.data : response.data.results || [];
             setOrders(ordersData);
             setFilteredOrders(ordersData);
@@ -108,58 +110,60 @@ const Orders: React.FC = () => {
                     </div>
                 </ScrollReveal>
 
-                {/* Estatísticas */}
-                <ScrollReveal>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-600">Total de Pedidos</p>
-                                    <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
-                                </div>
-                                <div className="bg-blue-100 rounded-full p-3">
-                                    <Package className="h-6 w-6 text-blue-600" />
+                {/* Estatísticas */} 
+                {user?.is_staff && (
+                    <ScrollReveal>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Total de Pedidos</p>
+                                        <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
+                                    </div>
+                                    <div className="bg-blue-100 rounded-full p-3">
+                                        <Package className="h-6 w-6 text-blue-600" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-600">Pendentes</p>
-                                    <p className="text-2xl font-bold text-yellow-600">{stats.pendentes}</p>
-                                </div>
-                                <div className="bg-yellow-100 rounded-full p-3">
-                                    <Clock className="h-6 w-6 text-yellow-600" />
+                            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Pendentes</p>
+                                        <p className="text-2xl font-bold text-yellow-600">{stats.pendentes}</p>
+                                    </div>
+                                    <div className="bg-yellow-100 rounded-full p-3">
+                                        <Clock className="h-6 w-6 text-yellow-600" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-600">Concluídos</p>
-                                    <p className="text-2xl font-bold text-green-600">{stats.pagos + stats.entregues}</p>
-                                </div>
-                                <div className="bg-green-100 rounded-full p-3">
-                                    <CheckCircle className="h-6 w-6 text-green-600" />
+                            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Concluídos</p>
+                                        <p className="text-2xl font-bold text-green-600">{stats.pagos + stats.entregues}</p>
+                                    </div>
+                                    <div className="bg-green-100 rounded-full p-3">
+                                        <CheckCircle className="h-6 w-6 text-green-600" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-600">Receita Total</p>
-                                    <p className="text-2xl font-bold text-green-600">R$ {totalRevenue.toFixed(2)}</p>
-                                </div>
-                                <div className="bg-green-100 rounded-full p-3">
-                                    <TrendingUp className="h-6 w-6 text-green-600" />
+                            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Receita Total</p>
+                                        <p className="text-2xl font-bold text-green-600">R$ {totalRevenue.toFixed(2)}</p>
+                                    </div>
+                                    <div className="bg-green-100 rounded-full p-3">
+                                        <TrendingUp className="h-6 w-6 text-green-600" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </ScrollReveal>
+                    </ScrollReveal>
+                )}
 
                 {/* Filtros */}
                 <ScrollReveal>
