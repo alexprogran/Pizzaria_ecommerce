@@ -61,3 +61,4 @@ media/
 # Static files (serão coletados durante o build)
 staticfiles/
 
+

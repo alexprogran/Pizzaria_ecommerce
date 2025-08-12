@@ -6,10 +6,9 @@ Esta é uma aplicação full stack com React (frontend), Django (backend), Postg
 
 ### Vídeo da Aplicação
 
-<video width="100%" controls>
-  <source src="image_project/bellaPizza.mp4" type="video/mp4">
-  Seu navegador não suporta o elemento de vídeo.
-</video>
+**📹 [Clique aqui para ver o vídeo da aplicação](image_project/bellaPizza_compressed.mp4)**
+
+*Nota: O vídeo foi comprimido para 13MB para melhor visualização no GitHub.*
 
 ### Design Responsivo
 
@@ -17,17 +16,17 @@ Esta é uma aplicação full stack com React (frontend), Django (backend), Postg
 
 <div style="text-align: center;">
 <h4>Home</h4>
-<img src="./image_project/resp_home.png" alt="Página Inicial Responsiva" width="150" height="300" style="object-fit: cover;">
+<img src="image_project/resp_home.png" alt="Página Inicial Responsiva" width="150" height="300" style="object-fit: cover;">
 </div>
 
 <div style="text-align: center;">
 <h4>Menu</h4>
-<img src="./image_project/resp_menu.png" alt="Menu Responsivo" width="150" height="300" style="object-fit: cover;">
+<img src="image_project/resp_menu.png" alt="Menu Responsivo" width="150" height="300" style="object-fit: cover;">
 </div>
 
 <div style="text-align: center;">
 <h4>Pedido</h4>
-<img src="./image_project/resp_pedido.png" alt="Pedido Responsivo" width="150" height="300" style="object-fit: cover;">
+<img src="image_project/resp_pedido.png" alt="Pedido Responsivo" width="150" height="300" style="object-fit: cover;">
 </div>
 
 </div>
@@ -171,4 +170,15 @@ Se você está usando WSL (Windows Subsystem for Linux):
 1. Clone o repositório
 2. Configure o arquivo `.env` (veja exemplo acima)
 3. Execute um dos scripts de inicialização:
-   - **WSL**: `
+   - **WSL**: `./start.sh`
+   - **Windows PowerShell**: `.\start.ps1`
+   - **Comandos manuais**: `docker-compose up --build`
+
+4. Acesse a aplicação:
+   - Frontend: http://localhost
+   - API: http://localhost/api
+   - Admin: http://localhost/admin
+
+5. Para desenvolvimento local:
+   - Frontend: Execute `npm install` e `npm run dev` na pasta `frontend/`
+   - Backend: Execute `python manage.py runserver` na pasta `backend/`
