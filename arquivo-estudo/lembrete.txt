@@ -1,0 +1,3 @@
+sobre o docker
+-automatizamos a implementação do superusuário nocontainer
+    -criamos o arquivo entrypoint.sh e copiamos no Dockerfile
