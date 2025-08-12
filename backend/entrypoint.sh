@@ -28,6 +28,9 @@ until postgres_ready; do
 done
 echo "PostgreSQL is available"
 
+echo "Creating migrations..."
+python manage.py makemigrations api
+
 echo "Applying migrations..."
 python manage.py migrate
 
