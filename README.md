@@ -2,6 +2,36 @@
 
 Esta é uma aplicação full stack com React (frontend), Django (backend), PostgreSQL (banco de dados) e Nginx (servidor web).
 
+## 🎥 Demonstração
+
+### Vídeo da Aplicação
+
+<video width="100%" controls>
+  <source src="image_project/bellaPizza.mp4" type="video/mp4">
+  Seu navegador não suporta o elemento de vídeo.
+</video>
+
+### Design Responsivo
+
+<div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+
+<div style="text-align: center;">
+<h4>Home</h4>
+<img src="./image_project/resp_home.png" alt="Página Inicial Responsiva" width="150" height="300" style="object-fit: cover;">
+</div>
+
+<div style="text-align: center;">
+<h4>Menu</h4>
+<img src="./image_project/resp_menu.png" alt="Menu Responsivo" width="150" height="300" style="object-fit: cover;">
+</div>
+
+<div style="text-align: center;">
+<h4>Pedido</h4>
+<img src="./image_project/resp_pedido.png" alt="Pedido Responsivo" width="150" height="300" style="object-fit: cover;">
+</div>
+
+</div>
+
 ## Arquitetura
 
 - **Frontend**: React com Vite, gera arquivos estáticos
@@ -141,43 +171,4 @@ Se você está usando WSL (Windows Subsystem for Linux):
 1. Clone o repositório
 2. Configure o arquivo `.env` (veja exemplo acima)
 3. Execute um dos scripts de inicialização:
-   - **WSL**: `./start.sh`
-   - **Windows**: `.\start.ps1`
-4. Acesse http://localhost
-
-### Troubleshooting WSL
-
-**Problema**: Docker não está rodando
-```bash
-# Verificar se o Docker está rodando
-docker info
-
-# Se não estiver, inicie o Docker Desktop no Windows
-```
-
-**Problema**: Permissões no WSL
-```bash
-# Tornar scripts executáveis
-chmod +x start.sh
-chmod +x backend/entrypoint.sh
-```
-
-**Problema**: Portas já em uso
-```bash
-# Parar todos os containers
-docker-compose down
-
-# Verificar portas em uso
-netstat -tulpn | grep :80
-netstat -tulpn | grep :5432
-```
-
-## Produção
-
-Para produção, considere:
-
-1. Usar `DEBUG=False`
-2. Configurar `SECRET_KEY` segura
-3. Configurar `ALLOWED_HOSTS` apropriadamente
-4. Usar volumes persistentes para dados
-5. Configurar SSL/TLS 
+   - **WSL**: `
