@@ -2,31 +2,58 @@
 
 Esta é uma aplicação full stack com React (frontend), Django (backend), PostgreSQL (banco de dados) e Nginx (servidor web).
 
-## 🎥 Demonstração
+## 🖥️ Demonstração Visual
 
-### Vídeo da Aplicação
+### Desktop 
 
-**📹 [Clique aqui para ver o vídeo da aplicação](image_project/bellaPizza_compressed.mp4)**
-
-*Nota: O vídeo foi comprimido para 13MB para melhor visualização no GitHub.*
-
-### Design Responsivo
-
-<div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+<div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px;">
 
 <div style="text-align: center;">
-<h4>Home</h4>
-<img src="image_project/resp_home.png" alt="Página Inicial Responsiva" width="150" height="300" style="object-fit: cover;">
+<h4>🔐 Login</h4>
+<img src="image_project/login_pc.png" alt="Página de Login - Desktop" style="width: 500px; object-fit: contain; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); border: 2px solid #f0f0f0; background-color: #f8f9fa; max-width: 100%;">
+<p style="margin-top: 10px; color: #666; font-size: 14px;">Tela de autenticação</p>
 </div>
 
 <div style="text-align: center;">
-<h4>Menu</h4>
-<img src="image_project/resp_menu.png" alt="Menu Responsivo" width="150" height="300" style="object-fit: cover;">
+<h4>🏠 Página Inicial</h4>
+<img src="image_project/home_pc.png" alt="Página Inicial - Desktop" style="width: 500px; object-fit: contain; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); border: 2px solid #f0f0f0; background-color: #f8f9fa; max-width: 100%;">
+<p style="margin-top: 10px; color: #666; font-size: 14px;">Interface principal da aplicação</p>
 </div>
 
 <div style="text-align: center;">
-<h4>Pedido</h4>
-<img src="image_project/resp_pedido.png" alt="Pedido Responsivo" width="150" height="300" style="object-fit: cover;">
+<h4>🛒 Carrinho</h4>
+<img src="image_project/cart_pc.png" alt="Carrinho de Compras - Desktop" style="width: 500px; object-fit: contain; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); border: 2px solid #f0f0f0; background-color: #f8f9fa; max-width: 100%;">
+<p style="margin-top: 10px; color: #666; font-size: 14px;">Sistema de carrinho de compras</p>
+</div>
+
+<div style="text-align: center;">
+<h4>⚙️ Gerência de Pedidos</h4>
+<img src="image_project/gerencia_pedido_pc.png" alt="Gerência de Pedidos - Desktop" style="width: 500px; object-fit: contain; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); border: 2px solid #f0f0f0; background-color: #f8f9fa; max-width: 100%;">
+<p style="margin-top: 10px; color: #666; font-size: 14px;">Painel administrativo</p>
+</div>
+
+</div>
+
+### 📱 Mobile - Design Responsivo
+
+<div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+
+<div style="text-align: center;">
+<h4>📱 Página Inicial Mobile</h4>
+<img src="image_project/resp_home.png" alt="Página Inicial - Mobile" width="180" height="360" style="object-fit: cover; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 3px solid #333;">
+<p style="margin-top: 8px; color: #666; font-size: 12px;">Versão mobile otimizada</p>
+</div>
+
+<div style="text-align: center;">
+<h4>📱 Pedido Mobile</h4>
+<img src="image_project/rep_pedido.png" alt="Pedido - Mobile" width="180" height="360" style="object-fit: cover; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 3px solid #333;">
+<p style="margin-top: 8px; color: #666; font-size: 12px;">Pedidos no mobile</p>
+</div>
+
+<div style="text-align: center;">
+<h4>📱 Informações Mobile</h4>
+<img src="image_project/resp_inform.png" alt="Informações - Mobile" width="180" height="360" style="object-fit: cover; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 3px solid #333;">
+<p style="margin-top: 8px; color: #666; font-size: 12px;">Contatos</p>
 </div>
 
 </div>
